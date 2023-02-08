@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+<script
+  type="text/javascript"
+  src="https://binaries.soliditylang.org/bin/soljson-v0.5.0+commit.1d4f565a.js"
+  crossorigin="anonymous">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/ethereumjs/browser-builds/dist/ethereumjs-tx/ethereumjs-tx-1.3.3.min.js"></script>
+
+<script type="text/javascript">
+  let contract;
+
+  const myHeaders = new Headers();
+
+  const myOptions = {
+    method: "GET",
+    headers: myHeaders,
+    mode: "cors",
+    cache: "default",
+  };
+  const myRequest = new Request("/complie", myOptions);
+
+
+  async function deploy(){
+  fetch(myRequest) .then((response) => response.text()).then((data) => contract = JSON.parse(data));
+  }
+
+</script>
+
+  <script type="text/javascript">
+    let reader;
+    let photo;
+    let url;
+    let result;
+    function upload() {
+      reader = new FileReader();
+      reader.onloadend = async function() {
+        const ipfs = await Ipfs.create() // Connect to IPFS
+        const buf = ethereumjs.Buffer.Buffer.from(reader.result,'uint8');
+        localStorage.setItem('buffer', buf);
+
+      
+        result = await ipfs.add(buf);
+
+        
+        console.log(result)
+      
+        url = await `https://ipfs.io/ipfs/${result.path}`
+        console.log(`Url --> ${url}`)
+        document.getElementById("url").innerHTML= url
+        document.getElementById("url").href= url
+        document.getElementById("output").src = url
+        
+        }
+      photo = document.getElementById("photo");
+      let nft = reader.readAsArrayBuffer(photo.files[0]); // Read Provided File
+      localStorage.setItem('ipfs_url', url);
+      localStorage.setItem('ipfs_tx', result);
+     }
+
+    
+  </script>
+<body>
+  <form action="/">
+    <fieldset>
+      <legend>Upload photo</legend>
+      <input type="file" name="photo" id="photo">
+      <button type="button" onclick="upload()">Upload</button>
+    </fieldset>
+  </form>
+  </br>
+  </br>
+  <a id="url"></a>
+  </br>
+  </br>
+  <img id="output">
+
+  <form action="/">
+    <label for="fname">Contract Name:</label><br>
+    <input type="text" id="fname" name="fname" value=""><br>
+    <label for="lname">Symbol:</label><br>
+    <input type="text" id="lname" name="lname" value=""><br><br>
+    <fieldset>
+      <button type="button" onclick="deploy()">Deploy NFT Contract</button>
+    </fieldset>
+  </form>
+</br>
+</br>
+</body>
+</html>
+
